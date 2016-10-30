@@ -294,7 +294,8 @@ module Spy
       module_eval do
         define_method method_under_test do |*args, &blk|
           result = super(*args, &blk)
-          puts "#{module_under_test}##{method_under_test}(#{args}) =>#{result}"
+          puts "1. `#{module_under_test}##{method_under_test}(#{args})`"
+          puts "`#{result}`"
           result
         end
       end
@@ -306,7 +307,7 @@ end
 
 class ActionView::TestCase
   setup do
-    puts "Example: #{self.name.gsub(/test_/, '')}"
+    puts "\n\n##{self.name.gsub(/test_/, '')}\n"
   end
 
   def self.tests(class_under_test)
