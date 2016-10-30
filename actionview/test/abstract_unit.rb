@@ -291,22 +291,18 @@ module Spy
 
       next if method_under_test.to_s.ends_with?("=")
 
-      module_under_test.module_eval do
-
-        define_method "#{method_under_test}_with_spy" do |*args, &blk|
-          result = self.send "#{method_under_test}_without_spy", *args, &blk
+      module_eval do
+        define_method method_under_test do |*args, &blk|
+          result = super(*args, &blk)
           puts "#{module_under_test}##{method_under_test}(#{args}) =>#{result}"
           result
         end
-
-        alias_method_chain method_under_test, :spy
       end
     end
   end
 
 
 end
-
 
 class ActionView::TestCase
   setup do
