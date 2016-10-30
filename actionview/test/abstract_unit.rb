@@ -284,31 +284,37 @@ class ActiveSupport::TestCase
   include ActiveSupport::Testing::MethodCallAssertions
 end
 
-class ActionView::TestCase
-  def self.tests(class_under_test)
-    super
 
-    class_eval do
-      setup do
-        puts "Example: #{self.name.gsub(/test_/, '')}"
-      end
-    end
-
-    class_under_test.public_instance_methods(false).each do |method_under_test|
+module Spy
+  def self.prepended(module_under_test)
+    module_under_test.public_instance_methods(false).each do |method_under_test|
 
       next if method_under_test.to_s.ends_with?("=")
 
-
-      class_under_test.module_eval do
+      module_under_test.module_eval do
 
         define_method "#{method_under_test}_with_spy" do |*args, &blk|
           result = self.send "#{method_under_test}_without_spy", *args, &blk
-          puts "#{class_under_test}##{method_under_test}(#{args}) =>#{result}"
+          puts "#{module_under_test}##{method_under_test}(#{args}) =>#{result}"
           result
         end
 
         alias_method_chain method_under_test, :spy
       end
     end
+  end
+
+
+end
+
+
+class ActionView::TestCase
+  setup do
+    puts "Example: #{self.name.gsub(/test_/, '')}"
+  end
+
+  def self.tests(class_under_test)
+    super
+    class_under_test.prepend Spy
   end
 end
